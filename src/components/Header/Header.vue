@@ -23,58 +23,95 @@
         <h3 v-else>Enter something in the search to get results</h3>
       </div>
       <div class="movies">
-        <div v-for="(movie, index) in movies" :key="index" class="movie">
-          <img class="movie-poster" v-if="movie.Poster !== 'N/A'" :src="movie.Poster" alt="Movie Poster" />
+        <div v-for="movie in movies" :key="movie.imdbID" class="movie-card">
+          <img class="movie-poster" v-if="movie.Poster !== 'N/A'" :src="movie.Poster" :alt="movie.Title" />
           <p v-else>No Poster Available</p>
-          <h3>Name: {{ movie.Title }}</h3>
-          <p>Year: {{ movie.Year }}</p>
-          <p>imdbID: {{ movie.imdbID }}</p>
-          <p>Type: {{ movie.Type }}</p>
+          <div class="movie-info">
+            <h3 class="movie-title">Name: {{ movie.Title }}</h3>
+            <p>Year: {{ movie.Year }}</p>
+            <p>imdbID: {{ movie.imdbID }}</p>
+            <p>Type: {{ movie.Type }}</p>
+          </div>
         </div>
+      </div>
+      <div v-if="movies.length > 0" class="pagination">
+        <span @click="changePage(page - 1)"> < </span>
+        <span
+            class="page"
+            :key="pageNum"
+            v-for="pageNum in displayedPages"
+            :class="{'current-page': page === pageNum}"
+            @click="changePage(pageNum)"
+
+        >{{ pageNum }}</span>
+        <span @click="changePage(page + 1)"> > </span>
       </div>
     </div>
   </main>
 </template>
 
 <script setup>
-  import { ref } from "vue";
+import { computed, ref } from "vue";
   import axios from "axios";
   import { API_KEY, API_URL } from "@/constants.js";
 
   const searchQuery = ref('');
   const movies = ref([]);
   const totalResults = ref(0);
+  const page = ref(1);
+  const totalPages = ref(0);
 
   const handleInput = async (ev) => {
     const input = ev.target.value;
 
     if (input.trim().length >= 3) {
       await fetchMovies(input);
+    } else {
+      movies.value = [];
+      totalResults.value = 0;
     }
   };
+
+  const changePage = async (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages.value) {
+      page.value = pageNumber;
+      await fetchMovies(searchQuery.value);
+    }
+  };
+
 
   const fetchMovies = async (query) => {
     try {
       const response = await axios.get(API_URL, {
         params: {
           apiKey: API_KEY,
-          s: query
+          s: query,
+          page: page.value
         }
       });
-
       if (response.data.Response === 'True') {
         movies.value = response.data.Search;
         totalResults.value = response.data.totalResults;
+        totalPages.value = Math.ceil(totalResults.value / 10);
       } else {
         movies.value = [];
         totalResults.value = 0;
       }
-
-      console.log(movies.value);
     } catch (e) {
       console.error('Error');
     }
   };
+
+  const displayedPages = computed(() => {
+    const current = page.value;
+    const total = totalPages.value;
+    const range = 10;
+
+    const start = Math.max(1, current - Math.floor(range / 2));
+    const end = Math.min(total, start + range - 1);
+
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  });
 
 </script>
 
@@ -91,7 +128,7 @@
   }
 
   .logo {
-    font-size: 32px;
+    font-size: 34px;
     font-weight: bold;
   }
 
@@ -123,23 +160,58 @@
   }
 
   .search-info {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .movies {
     display: flex;
-    justify-content: space-between;
     flex-wrap: wrap;
+    justify-content: space-between;
     margin-top: 40px;
   }
 
-  .movie {
+  .movie-card {
     width: 21%;
+    padding: 15px;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
   }
 
   .movie-poster {
-    width: 200px;
-    height: auto;
+    max-width: 100%;
+    height: 330px;
+    display: block;
+  }
+
+  .movie-info {
+    padding: 10px 20px;
+  }
+
+  .movie-title {
+    font-weight: 400;
+    font-size: inherit;
+  }
+
+  .movie-card p {
+    margin: 10px 0;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+
+  .page {
+    margin: 0 8px;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .current-page {
+    font-weight: bold;
   }
 
 </style>
