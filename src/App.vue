@@ -1,12 +1,9 @@
 <template>
-  <Header />
+  <MovieCatalog />
 </template>
 
 <script setup>
-import Header from './components/Header/Header.vue'
+  import MovieCatalog from "@/containers/MovieCatalog/MovieCatalog.vue";
 </script>
 
-
-<style scoped>
-
-</style>
+<style scoped></style>
