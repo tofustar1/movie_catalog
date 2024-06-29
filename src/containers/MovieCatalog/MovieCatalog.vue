@@ -3,7 +3,12 @@
   <main class="main">
     <div class="container">
       <SearchInfo :searchQuery="searchQuery" :totalResults="totalResults" />
-      <MovieList :movies="movies" />
+      <div v-if="isLoading">
+        <Spinner />
+      </div>
+      <div v-else>
+        <MovieList :movies="movies" />
+      </div>
       <Pagination
           v-if="movies.length > 0"
           :currentPage="page"
@@ -22,12 +27,14 @@
   import SearchInfo from "@/components/SearchInfo/SearchInfo.vue";
   import MovieList from "@/components/MovieList/MovieList.vue";
   import Pagination from "@/components/Pagination/Pagination.vue";
+  import Spinner from "@/components/Spinner/Spinner.vue";
 
   const searchQuery = ref('');
   const movies = ref([]);
   const totalResults = ref(0);
   const page = ref(1);
   const totalPages = ref(0);
+  const isLoading = ref(false);
 
   watch(searchQuery, async (newValue) => {
     if (newValue.trim().length >= 3) {
@@ -40,6 +47,7 @@
 
   const fetchMovies = async (query) => {
     try {
+      isLoading.value = true;
       const response = await axios.get(API_URL, {
         params: {
           apiKey: API_KEY,
@@ -57,6 +65,8 @@
       }
     } catch (e) {
       console.error('Error');
+    } finally {
+      isLoading.value = false;
     }
   };
 

@@ -1,7 +1,15 @@
 <template>
   <div class="movie-card">
-    <img class="movie-poster" v-if="movie.Poster !== 'N/A'" :src="movie.Poster" :alt="movie.Title" />
-    <p v-else>No Poster Available</p>
+    <img
+        class="movie-poster"
+        v-if="movie.Poster !== 'N/A'" :src="movie.Poster" :alt="movie.Title"
+    />
+    <img
+        v-else
+        class="movie-poster"
+        src="../../../assets/images/image-not-available.png"
+        alt="image not-available"
+    />
     <div class="movie-info">
       <h3 class="movie-title">Name: {{ movie.Title }}</h3>
       <p>Year: {{ movie.Year }}</p>
@@ -22,11 +30,29 @@
 
 <style scoped>
   .movie-card {
-    width: 21%;
+    width: calc(25% - 38px);
     padding: 15px;
     font-size: 16px;
     display: flex;
     flex-direction: column;
+  }
+  
+  @media screen and (max-width: 1000px) {
+    .movie-card {
+      width: calc(33% - 11px);
+    }
+  }
+
+  @media screen and (max-width: 748px) {
+    .movie-card {
+      width: calc(50% - 11px);
+    }
+  }
+
+  @media screen and (max-width: 475px) {
+    .movie-card {
+      width: 100%;
+    }
   }
 
   .movie-poster {

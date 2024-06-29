@@ -41,8 +41,15 @@
 
   .header-inner {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+  }
+
+  @media screen and (max-width: 748px) {
+    .static-user {
+      margin: 10px 0;
+    }
   }
 
   .logo {
@@ -56,6 +63,12 @@
     padding: 6px 5px;
     border: none;
     font-size: 16px;
+  }
+
+  @media screen and (max-width: 475px) {
+    .search {
+      margin: 10px 0;
+    }
   }
 
   .static-user {

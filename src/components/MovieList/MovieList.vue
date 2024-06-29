@@ -23,7 +23,14 @@
   .movies {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    margin-top: 40px;
+    gap: 10px 50px;
+    margin: 40px 0;
   }
+
+  @media screen and (max-width: 1000px) {
+    .movies {
+      gap: 10px 20px;
+    }
+  }
+
 </style>
